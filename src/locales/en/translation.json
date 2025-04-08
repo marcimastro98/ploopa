@@ -42,5 +42,16 @@
   "premiumSocialMoments": "Social moments during breaks",
   "premiumDetailedStats": "Detailed statistics and badges",
   "upgradeNow": "Upgrade now",
-  "month": "month"
+  "month": "month",
+
+  "yourFocusStats": "Your Focus Stats",
+  "sessionsToday": "Today",
+  "dayStreak": "Day Streak",
+  "level": "Level",
+
+  "weeklyChallengeTitle": "This Week's Challenge",
+  "viewChallengeDetails": "View Challenge",
+  "publicRooms": "Public Rooms",
+  "noRoomsAvailable": "No rooms available at the moment.",
+  "users": "users"
 }

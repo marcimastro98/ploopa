@@ -10,33 +10,49 @@ import {
 } from "react-native";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { Title, Subtitle } from "@/components/Typography";
 import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import Purchases from "react-native-purchases";
 import PremiumModal from "@/components/PremiumModal";
+import FocusStatsCard from "@/components/FocusStatsCard";
+import WeeklyChallengesCard from "@/components/WeeklyChallengesCard";
+import PublicRoomsList from "@/components/PublicRoomsList";
+import JoinCreateSession from "@/components/JoinCreateSession";
+
 import type { ReminderSetting } from "@/types/reminder";
 import { MAX_FREE_SESSIONS_PER_DAY } from "@/types/constants/subscription";
 import type { FocusTab } from "@/types/focus";
 
 export default function FocusScreen() {
-  const { t } = useTranslation();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
-  const router = useRouter();
-
+  // Stati esistenti
   const [selectedTab, setSelectedTab] = useState<FocusTab>("join");
   const [hydrationReminder, setHydrationReminder] = useState(true);
   const [stretchReminder, setStretchReminder] = useState(true);
   const [roomName, setRoomName] = useState("My Custom Room");
   const [focusTime, setFocusTime] = useState("25");
   const [breakTime, setBreakTime] = useState("5");
-
   const isPremium = false; // mock
   const sessionCount = 3; // mock
-
   const [showPremiumSheet, setShowPremiumSheet] = useState(false);
+
+  // Nuovi stati mock (per le stats)
+  const dayStreak = 5; // es. 5 giorni consecutivi
+  const level = 2; // es. livello 2
+
+  // Mock challenge data
+  const challengeTitle = "7-Day Focus Challenge";
+  const challengeCompleted = 3;
+  const challengeRequired = 7;
+
+  // Mock public rooms
+  const publicRooms = [
+    { id: "1", name: "Focus with Devs", currentUsers: 3, maxUsers: 10 },
+    { id: "2", name: "Morning Hustle", currentUsers: 8, maxUsers: 10 },
+    { id: "3", name: "Focus with Devs", currentUsers: 3, maxUsers: 10 },
+    { id: "4", name: "Morning Hustle", currentUsers: 8, maxUsers: 10 },
+    { id: "5", name: "Focus with Devs", currentUsers: 3, maxUsers: 10 },
+    { id: "6", name: "Morning Hustle", currentUsers: 8, maxUsers: 10 },
+  ];
 
   const reminderSettings: ReminderSetting[] = [
     {
@@ -65,7 +81,6 @@ export default function FocusScreen() {
     try {
       const offerings = await Purchases.getOfferings();
       const current = offerings.current;
-
       if (current?.availablePackages.length) {
         const purchase = await Purchases.purchasePackage(
           current.availablePackages[0]
@@ -78,178 +93,79 @@ export default function FocusScreen() {
     }
   };
 
+  // Handler per un join stanza pubblica
+  const handleJoinPublicRoom = (roomId: string) => {
+    console.log("Joining public room: ", roomId);
+    // Esempio: router.push(`/rooms/${roomId}`) oppure la tua logica
+  };
+
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { backgroundColor: colors.background },
-      ]}
-    >
-      {/* TABS */}
-      <View style={styles.tabContainer}>
-        {(["join", "create"] as const).map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            style={[
-              styles.tab,
-              selectedTab === tab && {
-                backgroundColor: colors.tint,
-                borderColor: colors.tint,
-              },
-            ]}
-            onPress={() => {
-              if (tab === "create" && !isPremium) {
-                setShowPremiumSheet(true);
-              } else {
-                setSelectedTab(tab);
-              }
-            }}
-          >
-            <View style={styles.tabContent}>
-              <Text
-                style={[
-                  styles.tabText,
-                  {
-                    color: selectedTab === tab ? "#fff" : colors.text,
-                    opacity: tab === "create" && !isPremium ? 0.5 : 1,
-                  },
-                ]}
-              >
-                {t(tab === "join" ? "joinRoom" : "createRoom")}
-              </Text>
-              {tab === "create" && !isPremium && (
-                <Ionicons
-                  name="lock-closed"
-                  size={16}
-                  color={colors.tint}
-                  style={{ marginLeft: 6, opacity: 0.6 }}
-                />
-              )}
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View style={[styles.container, { flex: 1 }]}>
+        {/* CARD STATS */}
+        <View>
+          <FocusStatsCard
+            sessionCountToday={sessionCount}
+            dayStreak={dayStreak}
+            level={level}
+          />
+        </View>
+        {/* CARD PUBLIC ROOMS */}
+        <View>
+          <PublicRoomsList
+            rooms={publicRooms}
+            onJoinRoom={handleJoinPublicRoom}
+          />
+        </View>
 
-      {/* CARD */}
-      <View
-        style={[
-          styles.card,
-          { backgroundColor: colorScheme === "dark" ? "#111" : "#fff" },
-        ]}
-      >
-        <Title style={{ color: colors.text }}>
-          {t(selectedTab === "join" ? "joinRoom" : "createRoom")}
-        </Title>
-        <Subtitle>
-          {t(
-            selectedTab === "join"
-              ? "joinRoomDescription"
-              : "createRoomDescription"
-          )}
-        </Subtitle>
+        {/* CARD "JOIN / CREATE" */}
+        <View>
+          <JoinCreateSession
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+            isPremium={isPremium}
+            showPremiumSheet={showPremiumSheet}
+            setShowPremiumSheet={setShowPremiumSheet}
+            reminderSettings={reminderSettings}
+            handleJoinRoom={handleJoinRoom}
+            roomName={roomName}
+            setRoomName={setRoomName}
+            focusTime={focusTime}
+            setFocusTime={setFocusTime}
+            breakTime={breakTime}
+            setBreakTime={setBreakTime}
+          />
+        </View>
 
-        {selectedTab === "join" ? (
-          <>
-            {reminderSettings.map(({ key, icon, state, setState }) => (
-              <View key={key} style={styles.switchRow}>
-                <Ionicons name={icon} size={24} color={colors.tint} />
-                <Text style={[styles.switchLabel, { color: colors.text }]}>
-                  {t(key)}
-                </Text>
-                <Switch value={state} onValueChange={setState} />
-              </View>
-            ))}
+        {/* CARD CHALLENGE */}
+        <View>
+          <WeeklyChallengesCard
+            challengeTitle={challengeTitle}
+            completedCount={challengeCompleted}
+            requiredCount={challengeRequired}
+          />
+        </View>
 
-            <TouchableOpacity
-              style={[
-                styles.primaryButton,
-                { backgroundColor: colors.focusBlue },
-              ]}
-              onPress={handleJoinRoom}
-            >
-              <Text style={styles.buttonText}>{t("joinNow")}</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <View style={styles.inputGroup}>
-              <Text style={[styles.inputLabel, { color: colors.text }]}>
-                {t("roomName")}
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  { borderColor: colors.tint, color: colors.text },
-                ]}
-                value={roomName}
-                onChangeText={setRoomName}
-                placeholder={t("roomName")}
-                placeholderTextColor={colors.tabIconDefault}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.inputLabel, { color: colors.text }]}>
-                {t("focusDuration")}
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  { borderColor: colors.tint, color: colors.text },
-                ]}
-                value={focusTime}
-                onChangeText={setFocusTime}
-                placeholder={t("focusDuration")}
-                keyboardType="numeric"
-                placeholderTextColor={colors.tabIconDefault}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.inputLabel, { color: colors.text }]}>
-                {t("breakDuration")}
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  { borderColor: colors.tint, color: colors.text },
-                ]}
-                value={breakTime}
-                onChangeText={setBreakTime}
-                placeholder={t("breakDuration")}
-                keyboardType="numeric"
-                placeholderTextColor={colors.tabIconDefault}
-              />
-            </View>
-
-            <TouchableOpacity
-              style={[
-                styles.primaryButton,
-                { backgroundColor: colors.pomodoroRed },
-              ]}
-            >
-              <Text style={styles.buttonText}>{t("startRoom")}</Text>
-            </TouchableOpacity>
-          </>
+        {/* MODALE PREMIUM */}
+        {showPremiumSheet && (
+          <PremiumModal
+            visible={showPremiumSheet}
+            onClose={() => setShowPremiumSheet(false)}
+            onUpgrade={handleUpgrade}
+          />
         )}
       </View>
-
-      {/* MODALE PREMIUM */}
-      {showPremiumSheet && (
-        <PremiumModal
-          visible={showPremiumSheet}
-          onClose={() => setShowPremiumSheet(false)}
-          onUpgrade={handleUpgrade}
-        />
-      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    gap: 16,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-around",
+    width: "100%",
+    paddingHorizontal: 10, // Added margin to the left and right
   },
   tabContainer: {
     flexDirection: "row",
@@ -269,14 +185,6 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 16,
     fontWeight: "600",
-  },
-  card: {
-    padding: 16,
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
   },
   switchRow: {
     flexDirection: "row",
