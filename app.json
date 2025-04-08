@@ -1,37 +1,27 @@
 {
   "expo": {
-    "name": "ploopa",
+    "scheme": "ploopa",
+    "name": "Ploopa",
     "slug": "ploopa",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "plugins": ["expo-router", "expo-dev-client", "expo-localization"],
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+      "userInterfaceStyle": "automatic",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ploopa.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+    "android": {
+      "userInterfaceStyle": "automatic",
+      "package": "com.ploopa.app"
     },
-    "plugins": [
-      "expo-router"
-    ],
-    "experiments": {
-      "typedRoutes": true
+    "extra": {
+      "eas": {
+        "projectId": "3b3dc73f-dba8-48ea-b68b-fb9ef404b057"
+      }
     }
   }
 }

@@ -1,0 +1,89 @@
+
+Checklist: Pubblicazione e Integrazione Pagamenti per Ploopa (iOS e Android)
+============================================================================
+
+npx eas build --profile development --platform ios
+
+
+📦 Requisiti prima della pubblicazione:
+---------------------------------------
+- ✅ App funzionante e testata (tutte le funzionalità complete).
+- ✅ RevenueCat integrato nel codice con `react-native-purchases`.
+- ✅ Un pacchetto prodotto attivo su RevenueCat (es: ploopa_premium_monthly).
+- ✅ Account sviluppatore attivo:
+    - Apple Developer (99€/anno): https://developer.apple.com/programs/
+    - Google Play Console (25$ una tantum): https://play.google.com/console
+
+-----------------------------------------------------------------------------
+
+📱 iOS – Passaggi per abilitare i pagamenti in-app:
+---------------------------------------------------
+1. Iscrizione a Apple Developer.
+2. Crea un App ID su Apple Developer → Certificates, IDs & Profiles.
+3. Abilita "In-App Purchases" su quel bundle ID.
+4. Vai su App Store Connect:
+   - Registra una nuova app.
+   - Carica icona, descrizione, screenshot.
+   - Sezione "In-App Purchases":
+     - Crea un prodotto (stesso `productId` usato su RevenueCat).
+     - Es: `ploopa_premium_monthly`.
+     - Metti prezzo e descrizione.
+     - Salva in stato “Ready to Submit”.
+
+5. Su RevenueCat:
+   - Vai su "Entitlements", crea "premium".
+   - Collega l’entitlement al prodotto iOS.
+   - Configura gli Store Credentials:
+     - Carica App-Specific Shared Secret per iOS.
+
+6. Da terminale:
+   - Autenticati con `eas device:create` se serve test su device.
+   - Fai build iOS:
+     ```sh
+     eas build --profile production --platform ios
+     ```
+
+7. Carica la build su TestFlight:
+   - Usa Transporter app o upload automatico da EAS.
+
+-----------------------------------------------------------------------------
+
+🤖 Android – Passaggi per Google Play Billing:
+----------------------------------------------
+1. Iscrizione a Google Play Console.
+2. Crea un nuovo progetto/app (pacchetto dev uguale a quello in `app.json`).
+3. Sezione “Prodotti in-app”:
+   - Crea un prodotto non consumabile o abbonamento.
+   - Stesso `productId` usato in RevenueCat (es. `ploopa_premium_monthly`).
+
+4. Su RevenueCat:
+   - Collega l’entitlement “premium” al prodotto Android.
+   - Inserisci Google Service Credentials (JSON) nel progetto RevenueCat.
+
+5. Firma la tua app:
+   - Genera keystore o usa managed keystore con EAS.
+
+6. Build Android:
+   ```sh
+   eas build --profile production --platform android
+   ```
+
+7. Carica la build .aab su Google Play Console → Versione di produzione o testing interno.
+
+-----------------------------------------------------------------------------
+
+🧪 Testing prima della pubblicazione:
+-------------------------------------
+- Usa TestFlight per iOS e Test Interno su Google Play.
+- Verifica che RevenueCat riceva gli eventi (acquisto, rinnovo).
+- Testa casi limite (annulla abbonamento, compra, riapri app, ecc.).
+
+-----------------------------------------------------------------------------
+
+📌 Suggerimenti finali:
+-----------------------
+- Tieni sempre allineati gli ID tra RevenueCat, App Store e Google Play.
+- Usa `expo-dev-client` per testare localmente i moduli nativi.
+- Ricordati di attivare la modalità "production" su RevenueCat al momento del rilascio.
+
+Fine 🚀
