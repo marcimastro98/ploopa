@@ -1,3 +1,4 @@
+import React from "react";
 import {
   View,
   Text,
@@ -9,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { PREMIUM_BENEFITS } from "@/src/types/constants/premiumBenefits"; // importa i benefits
 
 export default function PremiumScreen() {
   const { t, i18n } = useTranslation();
@@ -17,13 +19,6 @@ export default function PremiumScreen() {
 
   // Puoi prendere dinamicamente il prezzo e valuta locale
   const price = "2,99 €";
-
-  const benefits = [
-    { key: "premiumUnlimitedSessions", icon: "infinite-outline" },
-    { key: "premiumCreateRooms", icon: "people-outline" },
-    { key: "premiumSocialMoments", icon: "chatbubbles-outline" },
-    { key: "premiumDetailedStats", icon: "stats-chart-outline" },
-  ];
 
   return (
     <ScrollView
@@ -35,10 +30,10 @@ export default function PremiumScreen() {
       </Text>
 
       <View style={styles.benefits}>
-        {benefits.map((benefit) => (
+        {PREMIUM_BENEFITS.map((benefit) => (
           <View key={benefit.key} style={styles.benefitRow}>
             <Ionicons
-              name={benefit.icon as any}
+              name={benefit.icon as keyof typeof Ionicons.glyphMap}
               size={24}
               color={colors.tint}
             />

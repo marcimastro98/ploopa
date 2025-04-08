@@ -16,31 +16,49 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import Purchases from "react-native-purchases";
 import PremiumModal from "@/components/PremiumModal";
+import type { ReminderSetting } from "@/types/reminder";
+import { MAX_FREE_SESSIONS_PER_DAY } from "@/types/constants/subscription";
+import type { FocusTab } from "@/types/focus";
 
 export default function FocusScreen() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-
-  const [selectedTab, setSelectedTab] = useState<"join" | "create">("join");
   const router = useRouter();
+
+  const [selectedTab, setSelectedTab] = useState<FocusTab>("join");
   const [hydrationReminder, setHydrationReminder] = useState(true);
   const [stretchReminder, setStretchReminder] = useState(true);
   const [roomName, setRoomName] = useState("My Custom Room");
   const [focusTime, setFocusTime] = useState("25");
   const [breakTime, setBreakTime] = useState("5");
 
-  const isPremium = false; // mock utente
-  const sessionCount = 3; // sessioni fatte oggi
-  const maxFreeSessions = 3; // limite free user
+  const isPremium = false; // mock
+  const sessionCount = 3; // mock
 
   const [showPremiumSheet, setShowPremiumSheet] = useState(false);
 
+  const reminderSettings: ReminderSetting[] = [
+    {
+      key: "reminderHydration",
+      icon: "water-outline",
+      state: hydrationReminder,
+      setState: setHydrationReminder,
+    },
+    {
+      key: "reminderStretch",
+      icon: "body-outline",
+      state: stretchReminder,
+      setState: setStretchReminder,
+    },
+  ];
+
   const handleJoinRoom = () => {
-    if (!isPremium && sessionCount >= maxFreeSessions) {
+    if (!isPremium && sessionCount >= MAX_FREE_SESSIONS_PER_DAY) {
       setShowPremiumSheet(true);
       return;
     }
+    // altrimenti join logica
   };
 
   const handleUpgrade = async () => {
@@ -48,14 +66,13 @@ export default function FocusScreen() {
       const offerings = await Purchases.getOfferings();
       const current = offerings.current;
 
-      if (current!.availablePackages.length > 0) {
+      if (current?.availablePackages.length) {
         const purchase = await Purchases.purchasePackage(
-          current!.availablePackages[0]
+          current.availablePackages[0]
         );
         console.log("Purchase successful!", purchase);
+        setShowPremiumSheet(false);
       }
-
-      setShowPremiumSheet(false);
     } catch (err) {
       console.warn("Purchase failed:", err);
     }
@@ -68,6 +85,7 @@ export default function FocusScreen() {
         { backgroundColor: colors.background },
       ]}
     >
+      {/* TABS */}
       <View style={styles.tabContainer}>
         {(["join", "create"] as const).map((tab) => (
           <TouchableOpacity
@@ -112,6 +130,7 @@ export default function FocusScreen() {
         ))}
       </View>
 
+      {/* CARD */}
       <View
         style={[
           styles.card,
@@ -131,22 +150,13 @@ export default function FocusScreen() {
 
         {selectedTab === "join" ? (
           <>
-            {["reminderHydration", "reminderStretch"].map((key, idx) => (
+            {reminderSettings.map(({ key, icon, state, setState }) => (
               <View key={key} style={styles.switchRow}>
-                <Ionicons
-                  name={idx === 0 ? "water-outline" : "body-outline"}
-                  size={24}
-                  color={colors.tint}
-                />
+                <Ionicons name={icon} size={24} color={colors.tint} />
                 <Text style={[styles.switchLabel, { color: colors.text }]}>
                   {t(key)}
                 </Text>
-                <Switch
-                  value={idx === 0 ? hydrationReminder : stretchReminder}
-                  onValueChange={
-                    idx === 0 ? setHydrationReminder : setStretchReminder
-                  }
-                />
+                <Switch value={state} onValueChange={setState} />
               </View>
             ))}
 
@@ -162,28 +172,55 @@ export default function FocusScreen() {
           </>
         ) : (
           <>
-            {["roomName", "focusDuration", "breakDuration"].map(
-              (field, idx) => (
-                <View key={field} style={styles.inputGroup}>
-                  <Text style={[styles.inputLabel, { color: colors.text }]}>
-                    {t(field)}
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { borderColor: colors.tint, color: colors.text },
-                    ]}
-                    value={[roomName, focusTime, breakTime][idx]}
-                    onChangeText={
-                      [setRoomName, setFocusTime, setBreakTime][idx]
-                    }
-                    placeholder={t(field)}
-                    placeholderTextColor={colors.tabIconDefault}
-                    keyboardType={idx === 0 ? "default" : "numeric"}
-                  />
-                </View>
-              )
-            )}
+            <View style={styles.inputGroup}>
+              <Text style={[styles.inputLabel, { color: colors.text }]}>
+                {t("roomName")}
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: colors.tint, color: colors.text },
+                ]}
+                value={roomName}
+                onChangeText={setRoomName}
+                placeholder={t("roomName")}
+                placeholderTextColor={colors.tabIconDefault}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.inputLabel, { color: colors.text }]}>
+                {t("focusDuration")}
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: colors.tint, color: colors.text },
+                ]}
+                value={focusTime}
+                onChangeText={setFocusTime}
+                placeholder={t("focusDuration")}
+                keyboardType="numeric"
+                placeholderTextColor={colors.tabIconDefault}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.inputLabel, { color: colors.text }]}>
+                {t("breakDuration")}
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: colors.tint, color: colors.text },
+                ]}
+                value={breakTime}
+                onChangeText={setBreakTime}
+                placeholder={t("breakDuration")}
+                keyboardType="numeric"
+                placeholderTextColor={colors.tabIconDefault}
+              />
+            </View>
 
             <TouchableOpacity
               style={[
@@ -197,6 +234,7 @@ export default function FocusScreen() {
         )}
       </View>
 
+      {/* MODALE PREMIUM */}
       {showPremiumSheet && (
         <PremiumModal
           visible={showPremiumSheet}
