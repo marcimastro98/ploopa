@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/Colors";
@@ -36,6 +36,7 @@ export default function FocusRoomScreen() {
 
   const [sessionSecondsLeft, setSessionSecondsLeft] = useState(activeDuration);
 
+  // Countdown iniziale (Join Room)
   useEffect(() => {
     if (isCountdownRunning) {
       const interval = setInterval(() => {
@@ -44,19 +45,21 @@ export default function FocusRoomScreen() {
             clearInterval(interval);
             setIsCountdownRunning(false);
             setSessionStarted(true);
-            setSessionSecondsLeft(activeDuration);
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
-
       return () => clearInterval(interval);
     }
   }, [isCountdownRunning]);
 
+  // Countdown sessione
   useEffect(() => {
     if (!sessionStarted) return;
+
+    // Reset all’inizio di ogni nuova sessione o pausa
+    setSessionSecondsLeft(activeDuration);
 
     const interval = setInterval(() => {
       setSessionSecondsLeft((prev) => {
@@ -78,14 +81,17 @@ export default function FocusRoomScreen() {
         setCurrentSession((s) => s + 1);
         setIsBreak(false);
       } else {
-        setSessionStarted(false);
+        setSessionStarted(false); // fine di tutto il ciclo
       }
     } else {
-      setIsBreak(true);
+      setIsBreak(true); // passa alla pausa
     }
   };
 
-  const handleReaction = (reaction: string) => {};
+  const handleReaction = (reaction: string) => {
+    // Opzionale: invio al backend
+    console.log("Reaction:", reaction);
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
