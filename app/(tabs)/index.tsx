@@ -8,7 +8,7 @@ import {
   TextInput,
   Switch,
 } from "react-native";
-import { useColorScheme } from "@/components/useColorScheme";
+import { useColorScheme } from "@/components/config/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
@@ -18,7 +18,7 @@ import FocusStatsCard from "@/components/FocusStatsCard";
 import WeeklyChallengesCard from "@/components/WeeklyChallengesCard";
 import PublicRoomsList from "@/components/PublicRoomsList";
 import JoinCreateSession from "@/components/JoinCreateSession";
-
+import { useJoinNow } from "@/hooks/useJoinNow";
 import type { ReminderSetting } from "@/types/reminder";
 import { MAX_FREE_SESSIONS_PER_DAY } from "@/types/constants/subscription";
 import type { FocusTab } from "@/types/focus";
@@ -69,13 +69,13 @@ export default function FocusScreen() {
       setState: setStretchReminder,
     },
   ];
-
+  const { joinNow } = useJoinNow();
   const handleJoinRoom = () => {
     if (!isPremium && sessionCount >= MAX_FREE_SESSIONS_PER_DAY) {
       setShowPremiumSheet(true);
       return;
     }
-    // altrimenti join logica
+    joinNow(); // Call the joinNow function from the useJoinNow hook
   };
 
   const handleUpgrade = async () => {

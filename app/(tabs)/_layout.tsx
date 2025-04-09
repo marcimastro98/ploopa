@@ -3,8 +3,8 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/components/useColorScheme";
-import { useClientOnlyValue } from "@/components/useClientOnlyValue";
+import { useColorScheme } from "@/components/config/useColorScheme";
+import { useClientOnlyValue } from "@/components/config/useClientOnlyValue";
 import { useTranslation } from "react-i18next";
 import RevenueCatProvider from "@/providers/RevenueCatProvider";
 

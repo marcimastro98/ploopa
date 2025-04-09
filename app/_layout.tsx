@@ -11,7 +11,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import "../src/locales/i18n";
 
-import { useColorScheme } from "@/components/useColorScheme";
+import { useColorScheme } from "@/components/config/useColorScheme";
 
 export {
   // Catch any errors thrown by the Layout component.

@@ -16,7 +16,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { BlurView } from "@react-native-community/blur";
 import { useTranslation } from "react-i18next";
-import { useColorScheme } from "@/components/useColorScheme";
+import { useColorScheme } from "@/components/config/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import Purchases from "react-native-purchases";

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Title, Subtitle } from "@/components/Typography";
-import { useColorScheme } from "@/components/useColorScheme";
+import { useColorScheme } from "@/components/config/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";

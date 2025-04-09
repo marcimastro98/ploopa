@@ -13,7 +13,7 @@
   "streakInProgress": "Serie in corso!",
   "close": "Chiudi",
 
-  "focusRoomName": "Random Session",
+  "focusRoomName": "Sessione Casuale",
   "joinRoom": "Unisciti a una Focus Room",
   "joinRoomDescription": "Partecipa a una sessione pubblica e resta concentrato insieme agli altri.",
   "createRoom": "Crea la tua Stanza",
@@ -54,5 +54,11 @@
   "viewChallengeDetails": "Vedi Sfida",
   "publicRooms": "Stanze Pubbliche",
   "noRoomsAvailable": "Nessuna stanza disponibile al momento.",
-  "users": "utenti"
+  "users": "utenti",
+
+  "focus.room": {
+    "sessionStartsIn": "La sessione inizia tra {{seconds}}s",
+    "autoTitleNote": "Sessione pubblica automatica",
+    "waiting": "In attesa di altri utenti..."
+  }
 }

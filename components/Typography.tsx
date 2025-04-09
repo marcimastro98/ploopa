@@ -1,5 +1,5 @@
 import { Text, TextProps, StyleSheet } from "react-native";
-import { useColorScheme } from "@/components/useColorScheme";
+import { useColorScheme } from "@/components/config/useColorScheme";
 import { Colors } from "@/constants/Colors";
 
 function useThemeColor() {

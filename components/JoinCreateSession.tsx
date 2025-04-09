@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Title, Subtitle } from "@/components/Typography";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/components/useColorScheme";
+import { useColorScheme } from "@/components/config/useColorScheme";
 
 interface JoinCreateSessionProps {
   selectedTab: "join" | "create";

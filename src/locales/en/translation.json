@@ -54,5 +54,11 @@
   "viewChallengeDetails": "View Challenge",
   "publicRooms": "Public Rooms",
   "noRoomsAvailable": "No rooms available at the moment.",
-  "users": "users"
+  "users": "users",
+
+  "focus.room": {
+    "sessionStartsIn": "Session starts in {{seconds}}s",
+    "autoTitleNote": "Automatic public session",
+    "waiting": "Waiting for others to join..."
+  }
 }
