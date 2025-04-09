@@ -13,10 +13,11 @@
   "streakInProgress": "Streak in progress!",
   "close": "Close",
 
+  "focusRoomName": "Random Session",
   "joinRoom": "Join a Focus Room",
   "joinRoomDescription": "Join a public session and stay focused together.",
   "createRoom": "Create your Room",
-  "createRoomDescription": "Customize your room (Premium users only).",
+  "createRoomDescription": "Customize your room",
   "joinNow": "Join Now",
   "startRoom": "Start Room",
   "roomName": "Room Name",

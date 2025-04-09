@@ -132,6 +132,17 @@ export default function JoinCreateSession({
               <Switch value={state} onValueChange={setState} />
             </View>
           ))}
+          {/* Add a button to display the room name and allow clearing the selection */}
+          {selectedTab === "join" && roomName !== "Random" && (
+            <View style={styles.roomNameContainer}>
+              <TouchableOpacity onPress={() => setRoomName("Random")}>
+                <Ionicons name="close" size={24} color={colors.pomodoroRed} />
+              </TouchableOpacity>
+              <Text style={[styles.roomNameText, { color: colors.text }]}>
+                {roomName}
+              </Text>
+            </View>
+          )}
           <TouchableOpacity
             style={[
               styles.primaryButton,
@@ -160,38 +171,40 @@ export default function JoinCreateSession({
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.inputLabel, { color: colors.text }]}>
-              {t("focusDuration")}
-            </Text>
-            <TextInput
-              style={[
-                styles.input,
-                { borderColor: colors.tint, color: colors.text },
-              ]}
-              value={focusTime}
-              onChangeText={setFocusTime}
-              placeholder={t("focusDuration")}
-              keyboardType="numeric"
-              placeholderTextColor={colors.tabIconDefault}
-            />
-          </View>
+          <View style={styles.inputGroupTime}>
+            <View>
+              <Text style={[styles.inputLabel, { color: colors.text }]}>
+                {t("focusDuration")}
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: colors.tint, color: colors.text },
+                ]}
+                value={focusTime}
+                onChangeText={setFocusTime}
+                placeholder={t("focusDuration")}
+                keyboardType="numeric"
+                placeholderTextColor={colors.tabIconDefault}
+              />
+            </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.inputLabel, { color: colors.text }]}>
-              {t("breakDuration")}
-            </Text>
-            <TextInput
-              style={[
-                styles.input,
-                { borderColor: colors.tint, color: colors.text },
-              ]}
-              value={breakTime}
-              onChangeText={setBreakTime}
-              placeholder={t("breakDuration")}
-              keyboardType="numeric"
-              placeholderTextColor={colors.tabIconDefault}
-            />
+            <View>
+              <Text style={[styles.inputLabel, { color: colors.text }]}>
+                {t("breakDuration")}
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: colors.tint, color: colors.text },
+                ]}
+                value={breakTime}
+                onChangeText={setBreakTime}
+                placeholder={t("breakDuration")}
+                keyboardType="numeric"
+                placeholderTextColor={colors.tabIconDefault}
+              />
+            </View>
           </View>
 
           <TouchableOpacity
@@ -252,6 +265,12 @@ const styles = StyleSheet.create({
   inputGroup: {
     marginTop: 16,
   },
+  inputGroupTime: {
+    marginTop: 16,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   inputLabel: {
     fontSize: 16,
     fontWeight: "500",
@@ -276,5 +295,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
+  },
+  roomNameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginTop: 16,
+    display: "flex",
+    gap: 8,
+  },
+  roomNameText: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginRight: 8,
   },
 });

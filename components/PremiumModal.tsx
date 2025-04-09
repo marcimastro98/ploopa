@@ -117,7 +117,7 @@ export default function PremiumModal({ visible, onClose, onUpgrade }: Props) {
           </View>
 
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.pomodoroRed }]}
+            style={[styles.button, { backgroundColor: colors.focusBlue }]}
             onPress={handleUpgrade}
           >
             <Text style={styles.buttonText}>

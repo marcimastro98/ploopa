@@ -25,13 +25,14 @@ import type { FocusTab } from "@/types/focus";
 
 export default function FocusScreen() {
   // Stati esistenti
+  const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<FocusTab>("join");
   const [hydrationReminder, setHydrationReminder] = useState(true);
   const [stretchReminder, setStretchReminder] = useState(true);
-  const [roomName, setRoomName] = useState("My Custom Room");
+  const [roomName, setRoomName] = useState(t("focusRoomName"));
   const [focusTime, setFocusTime] = useState("25");
   const [breakTime, setBreakTime] = useState("5");
-  const isPremium = false; // mock
+  const isPremium = true; // mock
   const sessionCount = 3; // mock
   const [showPremiumSheet, setShowPremiumSheet] = useState(false);
 
@@ -95,6 +96,10 @@ export default function FocusScreen() {
 
   // Handler per un join stanza pubblica
   const handleJoinPublicRoom = (roomId: string) => {
+    const room = publicRooms.find((room) => room.id === roomId);
+    if (room) {
+      setRoomName(room.name);
+    }
     console.log("Joining public room: ", roomId);
     // Esempio: router.push(`/rooms/${roomId}`) oppure la tua logica
   };
@@ -128,7 +133,7 @@ export default function FocusScreen() {
             setShowPremiumSheet={setShowPremiumSheet}
             reminderSettings={reminderSettings}
             handleJoinRoom={handleJoinRoom}
-            roomName={roomName}
+            roomName={roomName} // Correctly passing the roomName state
             setRoomName={setRoomName}
             focusTime={focusTime}
             setFocusTime={setFocusTime}
