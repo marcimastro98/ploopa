@@ -24,17 +24,18 @@ import { MAX_FREE_SESSIONS_PER_DAY } from "@/types/constants/subscription";
 import type { FocusTab } from "@/types/focus";
 
 export default function FocusScreen() {
-  // Stati esistenti
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<FocusTab>("join");
   const [hydrationReminder, setHydrationReminder] = useState(true);
   const [stretchReminder, setStretchReminder] = useState(true);
+  const [breathReminder, setBreathReminder] = useState(true);
   const [roomName, setRoomName] = useState(t("focusRoomName"));
   const [focusTime, setFocusTime] = useState("25");
   const [breakTime, setBreakTime] = useState("5");
   const isPremium = true; // mock
   const sessionCount = 3; // mock
   const [showPremiumSheet, setShowPremiumSheet] = useState(false);
+  const { joinNow } = useJoinNow();
 
   // Nuovi stati mock (per le stats)
   const dayStreak = 5; // es. 5 giorni consecutivi
@@ -68,14 +69,24 @@ export default function FocusScreen() {
       state: stretchReminder,
       setState: setStretchReminder,
     },
+    {
+      key: "reminderBreath",
+      icon: "leaf-outline",
+      state: breathReminder,
+      setState: setBreathReminder,
+    },
   ];
-  const { joinNow } = useJoinNow();
-  const handleJoinRoom = () => {
+
+  const handleJoinRoom = (reminders: {
+    hydrationReminder: boolean;
+    stretchReminder: boolean;
+    breathReminder: boolean;
+  }) => {
     if (!isPremium && sessionCount >= MAX_FREE_SESSIONS_PER_DAY) {
       setShowPremiumSheet(true);
       return;
     }
-    joinNow(); // Call the joinNow function from the useJoinNow hook
+    joinNow(reminders);
   };
 
   const handleUpgrade = async () => {
@@ -100,66 +111,61 @@ export default function FocusScreen() {
     if (room) {
       setRoomName(room.name);
     }
-    console.log("Joining public room: ", roomId);
-    // Esempio: router.push(`/rooms/${roomId}`) oppure la tua logica
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={[styles.container, { flex: 1 }]}>
-        {/* CARD STATS */}
-        <View>
-          <FocusStatsCard
-            sessionCountToday={sessionCount}
-            dayStreak={dayStreak}
-            level={level}
-          />
-        </View>
-        {/* CARD PUBLIC ROOMS */}
-        <View>
-          <PublicRoomsList
-            rooms={publicRooms}
-            onJoinRoom={handleJoinPublicRoom}
-          />
-        </View>
-
-        {/* CARD "JOIN / CREATE" */}
-        <View>
-          <JoinCreateSession
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            isPremium={isPremium}
-            showPremiumSheet={showPremiumSheet}
-            setShowPremiumSheet={setShowPremiumSheet}
-            reminderSettings={reminderSettings}
-            handleJoinRoom={handleJoinRoom}
-            roomName={roomName} // Correctly passing the roomName state
-            setRoomName={setRoomName}
-            focusTime={focusTime}
-            setFocusTime={setFocusTime}
-            breakTime={breakTime}
-            setBreakTime={setBreakTime}
-          />
-        </View>
-
-        {/* CARD CHALLENGE */}
-        <View>
-          <WeeklyChallengesCard
-            challengeTitle={challengeTitle}
-            completedCount={challengeCompleted}
-            requiredCount={challengeRequired}
-          />
-        </View>
-
-        {/* MODALE PREMIUM */}
-        {showPremiumSheet && (
-          <PremiumModal
-            visible={showPremiumSheet}
-            onClose={() => setShowPremiumSheet(false)}
-            onUpgrade={handleUpgrade}
-          />
-        )}
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.section}>
+        <FocusStatsCard
+          sessionCountToday={sessionCount}
+          dayStreak={dayStreak}
+          level={level}
+        />
       </View>
+
+      <View style={styles.section}>
+        <PublicRoomsList
+          rooms={publicRooms}
+          onJoinRoom={handleJoinPublicRoom}
+        />
+      </View>
+
+      <View style={styles.section}>
+        <JoinCreateSession
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+          isPremium={isPremium}
+          showPremiumSheet={showPremiumSheet}
+          setShowPremiumSheet={setShowPremiumSheet}
+          reminderSettings={reminderSettings}
+          onJoinNow={(reminders) => handleJoinRoom(reminders)}
+          roomName={roomName}
+          setRoomName={setRoomName}
+          focusTime={focusTime}
+          setFocusTime={setFocusTime}
+          breakTime={breakTime}
+          setBreakTime={setBreakTime}
+        />
+      </View>
+
+      <View style={styles.section}>
+        <WeeklyChallengesCard
+          challengeTitle={challengeTitle}
+          completedCount={challengeCompleted}
+          requiredCount={challengeRequired}
+        />
+      </View>
+
+      {showPremiumSheet && (
+        <PremiumModal
+          visible={showPremiumSheet}
+          onClose={() => setShowPremiumSheet(false)}
+          onUpgrade={handleUpgrade}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -171,6 +177,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     width: "100%",
     paddingHorizontal: 10, // Added margin to the left and right
+  },
+  scrollContainer: {
+    paddingVertical: 24,
+    paddingHorizontal: 10,
+  },
+  section: {
+    marginBottom: 24,
   },
   tabContainer: {
     flexDirection: "row",

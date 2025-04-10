@@ -10,21 +10,33 @@ import Chat from "@/components/Chat";
 import FocusProgressCircle from "@/components/FocusProgressCircle";
 import LiveReactionsOverlay from "@/components/LiveReactionsOverlay";
 import { PomodoroConfig } from "@/src/types/constants/PomodoroConfig";
+import FocusTimerDisplay from "@/components/FocusTimerDisplay";
+import Purchases from "react-native-purchases";
+import PremiumModal from "@/components/PremiumModal";
+import {
+  ReminderType,
+  useWellnessReminders,
+} from "@/src/utils/reminders/UseWellnessRemindersParams";
+import ReminderBanner from "@/components/ReminderBanner";
 
 export default function FocusRoomScreen() {
-  const { roomId, isNew } = useLocalSearchParams();
+  const { roomId, isNew, hydration, stretch, breath } = useLocalSearchParams();
+  const hydrationReminder = hydration === "true";
+  const stretchReminder = stretch === "true";
+  const breathReminder = breath === "true";
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
-  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [secondsLeft, setSecondsLeft] = useState(1);
   const [isCountdownRunning, setIsCountdownRunning] = useState(
     isNew === "true"
   );
   const [sessionStarted, setSessionStarted] = useState(false);
   const [currentSession, setCurrentSession] = useState(1);
   const [isBreak, setIsBreak] = useState(false);
-  const [isPremium] = useState(false); // TODO: fetch real user premium status
+  const [isPremium] = useState(true);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const totalSessions = isPremium
     ? PomodoroConfig.totalSessionsPremiumDefault
@@ -36,7 +48,27 @@ export default function FocusRoomScreen() {
 
   const [sessionSecondsLeft, setSessionSecondsLeft] = useState(activeDuration);
 
-  // Countdown iniziale (Join Room)
+  const [reminderToShow, setReminderToShow] = useState<ReminderType | null>(
+    null
+  );
+
+  const { showReminder } = useWellnessReminders({
+    hydrationReminder,
+    stretchReminder,
+    breathReminder,
+    currentSession,
+    isBreak,
+    activeDuration,
+    sessionSecondsLeft,
+    debug: true,
+  });
+
+  useEffect(() => {
+    if (showReminder) {
+      setReminderToShow(showReminder);
+    }
+  }, [showReminder]);
+
   useEffect(() => {
     if (isCountdownRunning) {
       const interval = setInterval(() => {
@@ -54,21 +86,19 @@ export default function FocusRoomScreen() {
     }
   }, [isCountdownRunning]);
 
-  // Countdown sessione
   useEffect(() => {
     if (!sessionStarted) return;
-
-    // Reset all’inizio di ogni nuova sessione o pausa
     setSessionSecondsLeft(activeDuration);
 
     const interval = setInterval(() => {
       setSessionSecondsLeft((prev) => {
-        if (prev <= 1) {
+        const next = prev - 1;
+        if (next <= 0) {
           clearInterval(interval);
           handleSessionEnd();
           return 0;
         }
-        return prev - 1;
+        return next;
       });
     }, 1000);
 
@@ -81,29 +111,53 @@ export default function FocusRoomScreen() {
         setCurrentSession((s) => s + 1);
         setIsBreak(false);
       } else {
-        setSessionStarted(false); // fine di tutto il ciclo
+        setSessionStarted(false);
       }
     } else {
-      setIsBreak(true); // passa alla pausa
+      setIsBreak(true);
     }
   };
 
   const handleReaction = (reaction: string) => {
-    // Opzionale: invio al backend
     console.log("Reaction:", reaction);
+  };
+
+  const handleUpgrade = async () => {
+    try {
+      const offerings = await Purchases.getOfferings();
+      const current = offerings.current;
+      if (current?.availablePackages.length) {
+        const purchase = await Purchases.purchasePackage(
+          current.availablePackages[0]
+        );
+        console.log("Purchase successful!", purchase);
+        setShowPremiumModal(false);
+      }
+    } catch (err) {
+      console.warn("Purchase failed:", err);
+    }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>Focus Room</Text>
-      <Text style={[styles.subtitle, { color: colors.text }]}>
-        Room ID: <Text style={{ fontWeight: "bold" }}>{roomId}</Text>
-      </Text>
+      {reminderToShow && (
+        <ReminderBanner
+          type={reminderToShow}
+          label={t(`reminder.${reminderToShow}`)}
+          onHide={() => setReminderToShow(null)}
+        />
+      )}
 
       <UserCounter />
-
       {isCountdownRunning ? (
         <View style={styles.countdownContainer}>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {t("focusRoomTitle")}
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.text }]}>
+            {t("focusRoomId")}:{" "}
+            <Text style={{ fontWeight: "bold" }}>{roomId}</Text>
+          </Text>
           <Text style={[styles.countdownText, { color: colors.tint }]}>
             {t("focus.room.sessionStartsIn", { seconds: secondsLeft })}
           </Text>
@@ -115,6 +169,7 @@ export default function FocusRoomScreen() {
         </View>
       ) : sessionStarted ? (
         <>
+          <FocusTimerDisplay isBreak={isBreak} />
           <FocusProgressCircle
             secondsLeft={sessionSecondsLeft}
             totalDuration={activeDuration}
@@ -122,7 +177,10 @@ export default function FocusRoomScreen() {
           />
 
           <Text style={[styles.sessionCount, { color: colors.text }]}>
-            {`Session ${currentSession} / ${totalSessions}`}
+            {t("focusRoomSession", {
+              current: currentSession,
+              total: totalSessions,
+            })}
           </Text>
 
           {!isBreak && (
@@ -132,11 +190,25 @@ export default function FocusRoomScreen() {
             </>
           )}
 
-          {isBreak && <Chat isPremium={isPremium} />}
+          {isBreak && (
+            <>
+              <Chat
+                isPremium={isPremium}
+                onUpgradePress={() => setShowPremiumModal(true)}
+              />
+              {showPremiumModal && (
+                <PremiumModal
+                  visible={showPremiumModal}
+                  onClose={() => setShowPremiumModal(false)}
+                  onUpgrade={handleUpgrade}
+                />
+              )}
+            </>
+          )}
         </>
       ) : (
         <Text style={[styles.focusText, { color: colors.tint }]}>
-          🎉 All sessions completed!
+          {t("focusRoomCompleted")}
         </Text>
       )}
     </View>
@@ -145,10 +217,11 @@ export default function FocusRoomScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    height: "100%",
     alignItems: "center",
     padding: 24,
+    width: "100%",
   },
   title: {
     fontSize: 24,

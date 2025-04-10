@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -25,7 +25,11 @@ interface JoinCreateSessionProps {
     state: boolean;
     setState: (value: boolean) => void;
   }[];
-  handleJoinRoom: () => void;
+  onJoinNow: (reminders: {
+    hydrationReminder: boolean;
+    stretchReminder: boolean;
+    breathReminder: boolean;
+  }) => void;
   roomName: string;
   setRoomName: (name: string) => void;
   focusTime: string;
@@ -41,7 +45,7 @@ export default function JoinCreateSession({
   showPremiumSheet,
   setShowPremiumSheet,
   reminderSettings,
-  handleJoinRoom,
+  onJoinNow,
   roomName,
   setRoomName,
   focusTime,
@@ -52,6 +56,27 @@ export default function JoinCreateSession({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const [remindersExpanded, setRemindersExpanded] = useState(false);
+
+  const reminderMap = reminderSettings.reduce(
+    (acc, curr) => {
+      if (curr.key === "reminderHydration") {
+        acc.hydrationReminder = curr.state;
+      }
+      if (curr.key === "reminderStretch") {
+        acc.stretchReminder = curr.state;
+      }
+      if (curr.key === "reminderBreath") {
+        acc.breathReminder = curr.state;
+      }
+      return acc;
+    },
+    {
+      hydrationReminder: true,
+      stretchReminder: true,
+      breathReminder: true,
+    }
+  );
 
   return (
     <View
@@ -123,32 +148,57 @@ export default function JoinCreateSession({
 
       {selectedTab === "join" ? (
         <>
-          {reminderSettings.map(({ key, icon, state, setState }) => (
-            <View key={key} style={styles.switchRow}>
-              <Ionicons name={icon} size={24} color={colors.tint} />
-              <Text style={[styles.switchLabel, { color: colors.text }]}>
-                {t(key)}
+          {/* Reminder Section */}
+          <TouchableOpacity
+            onPress={() => setRemindersExpanded(!remindersExpanded)}
+            style={[
+              styles.reminderToggle,
+              { borderBottomColor: colors.onSurface },
+            ]}
+          >
+            <View style={styles.reminderToggleContent}>
+              <Ionicons name="notifications" size={20} color={colors.tint} />
+              <Text style={[styles.reminderToggleText, { color: colors.text }]}>
+                {t("reminderSettings")}
               </Text>
-              <Switch value={state} onValueChange={setState} />
             </View>
-          ))}
-          {/* Add a button to display the room name and allow clearing the selection */}
-          {selectedTab === "join" && roomName !== "Random" && (
-            <View style={styles.roomNameContainer}>
-              <TouchableOpacity onPress={() => setRoomName("Random")}>
-                <Ionicons name="close" size={24} color={colors.pomodoroRed} />
-              </TouchableOpacity>
-              <Text style={[styles.roomNameText, { color: colors.text }]}>
-                {roomName}
-              </Text>
+            <Ionicons
+              name={remindersExpanded ? "chevron-up" : "chevron-down"}
+              size={20}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+          {remindersExpanded && (
+            <View>
+              {reminderSettings.map(({ key, icon, state, setState }) => (
+                <View key={key} style={styles.switchRow}>
+                  <Ionicons name={icon} size={24} color={colors.tint} />
+                  <Text style={[styles.switchLabel, { color: colors.text }]}>
+                    {t(key)}
+                  </Text>
+                  <Switch value={state} onValueChange={setState} />
+                </View>
+              ))}
             </View>
           )}
+
+          <View style={styles.roomNameContainer}>
+            <TouchableOpacity onPress={() => setRoomName("Random Session")}>
+              {roomName !== "Random Session" && (
+                <Ionicons name="close" size={24} color={colors.pomodoroRed} />
+              )}
+            </TouchableOpacity>
+            <Text style={[styles.roomNameText, { color: colors.text }]}>
+              {roomName}
+            </Text>
+          </View>
+
           <TouchableOpacity
             style={[
               styles.primaryButton,
               { backgroundColor: colors.focusBlue },
             ]}
-            onPress={handleJoinRoom}
+            onPress={() => onJoinNow(reminderMap)}
           >
             <Text style={styles.buttonText}>{t("joinNow")}</Text>
           </TouchableOpacity>
@@ -220,7 +270,6 @@ export default function JoinCreateSession({
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
@@ -308,5 +357,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     marginRight: 8,
+  },
+  reminderToggle: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  reminderToggleContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  reminderToggleText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

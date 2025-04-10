@@ -25,6 +25,12 @@
   "breakDuration": "Durata Pausa (min)",
   "reminderHydration": "Promemoria Idratazione",
   "reminderStretch": "Promemoria Stretching",
+  "reminderSettings": "Impostazioni Promemoria",
+  "reminder": {
+    "hydration": "È ora di idratarti!",
+    "stretch": "È il momento di fare stretching!",
+    "breathe": "Fai un bel respiro profondo"
+  },
 
   "limitReachedTitle": "Limite di sessioni raggiunto",
   "limitReachedMessage": "Passa a Premium per accesso illimitato.",
@@ -55,10 +61,24 @@
   "publicRooms": "Stanze Pubbliche",
   "noRoomsAvailable": "Nessuna stanza disponibile al momento.",
   "users": "utenti",
+  "usersOnline": "Utenti Online: {{count}}",
+  "focusRoomTitle": "Focus Room",
+  "focusRoomId": "Room ID",
+  "focusRoomSession": "Session {{current}} / {{total}}",
+  "focusRoomCompleted": "🎉 All sessions completed!",
 
   "focus.room": {
     "sessionStartsIn": "La sessione inizia tra {{seconds}}s",
     "autoTitleNote": "Sessione pubblica automatica",
     "waiting": "In attesa di altri utenti..."
-  }
+  },
+
+  "chat": {
+    "writePlaceholder": "Scrivi un messaggio...",
+    "send": "Invia",
+    "premiumOnly": "🔒 Solo per utenti Premium"
+  },
+
+  "focusTimeLabel": "È ora di concentrarsi!",
+  "breakTimeLabel": "Pausa!"
 }

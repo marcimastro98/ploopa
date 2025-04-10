@@ -14,7 +14,7 @@ export default function ReactionsBar({ onReact }: ReactionsBarProps) {
   const colors = Colors[colorScheme ?? "light"];
 
   const handleReact = (reaction: string) => {
-    onReact(reaction); // se serve ancora
+    onReact(reaction);
     ReactionEmitter.emit("reaction", reaction);
   };
 

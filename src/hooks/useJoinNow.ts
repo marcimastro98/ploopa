@@ -5,14 +5,31 @@ import { getRandomAutoRoomTitle } from "@/utils/getRandomAutoRoomTitle";
 export const useJoinNow = () => {
   const router = useRouter();
 
-  const joinNow = async () => {
+  const joinNow = async ({
+    hydrationReminder,
+    stretchReminder,
+    breathReminder,
+  }: {
+    hydrationReminder: boolean;
+    stretchReminder: boolean;
+    breathReminder: boolean;
+  }) => {
     try {
       const existingRoom = await getActivePublicRoom();
+
+      const reminderParams = {
+        hydration: hydrationReminder.toString(),
+        stretch: stretchReminder.toString(),
+        breath: breathReminder.toString(),
+      };
 
       if (existingRoom) {
         router.push({
           pathname: "/focus-room",
-          params: { roomId: existingRoom.id },
+          params: {
+            roomId: existingRoom.id,
+            ...reminderParams,
+          },
         });
       } else {
         const newRoom = await createRoom({
@@ -27,6 +44,7 @@ export const useJoinNow = () => {
           params: {
             roomId: newRoom.id,
             isNew: "true",
+            ...reminderParams,
           },
         });
       }

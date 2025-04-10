@@ -1,4 +1,7 @@
-export type ReminderKey = "reminderHydration" | "reminderStretch";
+export type ReminderKey =
+  | "reminderHydration"
+  | "reminderStretch"
+  | "reminderBreath";
 
 export type ReminderSetting = {
   key: ReminderKey;
