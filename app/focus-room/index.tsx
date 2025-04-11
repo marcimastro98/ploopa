@@ -215,6 +215,11 @@ export default function FocusRoomScreen() {
   );
 }
 
+FocusRoomScreen.options = {
+  headerShown: true, // Ensure the header is shown
+  headerBackVisible: true, // Ensure the back button is visible
+};
+
 const styles = StyleSheet.create({
   container: {
     justifyContent: "flex-start",

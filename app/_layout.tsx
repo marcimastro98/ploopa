@@ -12,6 +12,7 @@ import "react-native-reanimated";
 import "../src/locales/i18n";
 
 import { useColorScheme } from "@/components/config/useColorScheme";
+import { useTranslation } from "react-i18next";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -53,11 +54,20 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const { t } = useTranslation();
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="focus-room"
+          options={{
+            headerShown: true,
+            headerTitle: "Let's Focus!",
+            headerBackTitle: t("back"),
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
