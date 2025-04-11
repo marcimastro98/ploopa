@@ -256,6 +256,39 @@ export default function JoinCreateSession({
               />
             </View>
           </View>
+          {/* Reminder Section */}
+          <TouchableOpacity
+            onPress={() => setRemindersExpanded(!remindersExpanded)}
+            style={[
+              styles.reminderToggle,
+              { borderBottomColor: colors.onSurface },
+            ]}
+          >
+            <View style={styles.reminderToggleContent}>
+              <Ionicons name="notifications" size={20} color={colors.tint} />
+              <Text style={[styles.reminderToggleText, { color: colors.text }]}>
+                {t("reminderSettings")}
+              </Text>
+            </View>
+            <Ionicons
+              name={remindersExpanded ? "chevron-up" : "chevron-down"}
+              size={20}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+          {remindersExpanded && (
+            <View>
+              {reminderSettings.map(({ key, icon, state, setState }) => (
+                <View key={key} style={styles.switchRow}>
+                  <Ionicons name={icon} size={24} color={colors.tint} />
+                  <Text style={[styles.switchLabel, { color: colors.text }]}>
+                    {t(key)}
+                  </Text>
+                  <Switch value={state} onValueChange={setState} />
+                </View>
+              ))}
+            </View>
+          )}
 
           <TouchableOpacity
             style={[
